@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\dev\\pistachio\\Pistachio.api\\Pistachio.api.csproj": {}
+    "C:\\dev\\pistachio\\Pistachio-api\\Pistachio.api.csproj": {}
   },
   "projects": {
-    "C:\\dev\\pistachio\\Pistachio.api\\Pistachio.api.csproj": {
+    "C:\\dev\\pistachio\\Pistachio-api\\Pistachio.api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\dev\\pistachio\\Pistachio.api\\Pistachio.api.csproj",
+        "projectUniqueName": "C:\\dev\\pistachio\\Pistachio-api\\Pistachio.api.csproj",
         "projectName": "Pistachio.api",
-        "projectPath": "C:\\dev\\pistachio\\Pistachio.api\\Pistachio.api.csproj",
+        "projectPath": "C:\\dev\\pistachio\\Pistachio-api\\Pistachio.api.csproj",
         "packagesPath": "C:\\Users\\Fernando\\.nuget\\packages\\",
-        "outputPath": "C:\\dev\\pistachio\\Pistachio.api\\obj\\",
+        "outputPath": "C:\\dev\\pistachio\\Pistachio-api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Fernando\\AppData\\Roaming\\NuGet\\NuGet.Config"
