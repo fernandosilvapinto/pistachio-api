@@ -20,6 +20,7 @@ namespace Pistachio.Api.Controllers
         }
 
         // GET: api/Services
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -39,6 +40,7 @@ namespace Pistachio.Api.Controllers
         }
 
         // GET: api/Services/{id}
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
