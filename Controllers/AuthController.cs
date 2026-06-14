@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,6 +8,7 @@ using System.Text;
 using Pistachio.Api.Data;
 using Pistachio.Api.Models;
 using Pistachio.Api.DTOs.Auth;
+
 
 [Route("api/[controller]")]
 [ApiController]
@@ -40,6 +42,38 @@ public class AuthController : ControllerBase
             Token = token,
             Role = user.Role.Name
         });
+    }
+
+    // POST api/auth/register
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterRequest request)
+    {
+        // Verifica se o email já existe
+        var exists = await _context.Users.AnyAsync(u => u.Email == request.Email);
+        if (exists)
+            return Conflict(new { message = "Este email já está registado." });
+
+        // Procura o role Customer
+        var customerRole = await _context.Roles
+            .FirstOrDefaultAsync(r => r.Name == "Customer");
+
+        if (customerRole == null)
+            return StatusCode(500, new { message = "Role Customer não encontrado." });
+
+        // Cria o utilizador
+        var user = new User
+        {
+            Name = request.Name,
+            Email = request.Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            RoleId = customerRole.Id
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Conta criada com sucesso." });
     }
 
     private string GenerateJwtToken(User user)

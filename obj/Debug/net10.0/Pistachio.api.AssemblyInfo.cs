@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pistachio.api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9491b677bd427db0b481d8323ff45e2684f43b8c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f4ee564f5aca5d18445faf08d3df3ba5fc44eb95")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pistachio.api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pistachio.api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
