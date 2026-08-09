@@ -1,3 +1,5 @@
+using Pistachio.Api.Models;
+
 namespace Pistachio.Api.DTOs.Schedulings;
 
 public class SchedulingResponse
@@ -7,6 +9,8 @@ public class SchedulingResponse
     public DateTime ScheduledDate { get; set; }
 
     public string ServiceName { get; set; } = string.Empty;
+
+    public SchedulingStatus Status { get; set; }
 
     public int UserId { get; set; }
 

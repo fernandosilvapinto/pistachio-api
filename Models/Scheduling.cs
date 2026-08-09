@@ -5,7 +5,8 @@ namespace Pistachio.Api.Models
         public int Id { get; set; }
         public DateTime ScheduledDate { get; set; }
         public string ServiceName { get; set; } = string.Empty;
-        
+        public SchedulingStatus Status { get; set; } = SchedulingStatus.Pending;
+
         // Relacionamento com User
         public int UserId { get; set; }
         public User User { get; set; } = null!;

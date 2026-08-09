@@ -27,6 +27,7 @@ builder.Services.AddControllers()
         {
             options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
             options.JsonSerializerOptions.WriteIndented = true; // opcional: deixa o JSON formatado
+            options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
         });
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

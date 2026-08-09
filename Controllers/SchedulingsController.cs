@@ -29,6 +29,7 @@ namespace Pistachio.Api.Controllers
                     Id = s.Id,
                     ScheduledDate = s.ScheduledDate,
                     ServiceName = s.ServiceName,
+                    Status = s.Status,
                     UserId = s.UserId,
                     ServiceId = s.ServiceId
                 })
@@ -48,6 +49,7 @@ namespace Pistachio.Api.Controllers
                     Id = s.Id,
                     ScheduledDate = s.ScheduledDate,
                     ServiceName = s.ServiceName,
+                    Status = s.Status,
                     UserId = s.UserId,
                     ServiceId = s.ServiceId
                 })
@@ -79,6 +81,7 @@ namespace Pistachio.Api.Controllers
                 Id = scheduling.Id,
                 ScheduledDate = scheduling.ScheduledDate,
                 ServiceName = scheduling.ServiceName,
+                Status = scheduling.Status,
                 UserId = scheduling.UserId,
                 ServiceId = scheduling.ServiceId
             };
@@ -114,6 +117,32 @@ namespace Pistachio.Api.Controllers
             return NoContent();
         }
         
+        // PATCH: api/schedulings/{id}/status
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, UpdateSchedulingStatusRequest request)
+        {
+            var scheduling = await _context.Schedulings.FindAsync(id);
+
+            if (scheduling == null)
+                return NotFound();
+
+            scheduling.Status = request.Status;
+
+            await _context.SaveChangesAsync();
+
+            var response = new SchedulingResponse
+            {
+                Id = scheduling.Id,
+                ScheduledDate = scheduling.ScheduledDate,
+                ServiceName = scheduling.ServiceName,
+                Status = scheduling.Status,
+                UserId = scheduling.UserId,
+                ServiceId = scheduling.ServiceId
+            };
+
+            return Ok(response);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
