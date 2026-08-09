@@ -1,0 +1,14 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+
+# Config de ambiente local
+appsettings.development.json
+appsettings.Development.json
+
+# Frontend legado (fora de uso — mantido localmente, não versionado)
+pistachio-frontend/
