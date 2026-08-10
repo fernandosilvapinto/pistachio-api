@@ -8,6 +8,10 @@ namespace Pistachio.Api.Models
         public string PasswordHash { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        // Reset de password (login normal ou "definir password" após agendamento de visitante)
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiresAt { get; set; }
+
         //Relacionamento com Roles
         public int RoleId { get; set; }
         public Role Role { get; set; } = null!;

@@ -26,7 +26,8 @@ namespace Pistachio.Api.Controllers
                     Id = u.Id,
                     Name = u.Name,
                     Email = u.Email,
-                    Role = u.Role.Name
+                    Role = u.Role.Name,
+                    CreatedAt = u.CreatedAt
                 })
                 .ToListAsync();
 
@@ -44,7 +45,8 @@ namespace Pistachio.Api.Controllers
                     Id = u.Id,
                     Name = u.Name,
                     Email = u.Email,
-                    Role = u.Role.Name
+                    Role = u.Role.Name,
+                    CreatedAt = u.CreatedAt
                 })
                 .FirstOrDefaultAsync();
 
@@ -79,7 +81,8 @@ namespace Pistachio.Api.Controllers
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
-                Role = user.Role.Name
+                Role = user.Role.Name,
+                CreatedAt = user.CreatedAt
             };
 
             return CreatedAtAction(
@@ -145,7 +148,8 @@ namespace Pistachio.Api.Controllers
                     Id = u.Id,
                     Name = u.Name,
                     Email = u.Email,
-                    Role = u.Role.Name
+                    Role = u.Role.Name,
+                    CreatedAt = u.CreatedAt
                 })
                 .FirstOrDefaultAsync();
 

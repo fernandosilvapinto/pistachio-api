@@ -19,4 +19,8 @@ public class SchedulingResponse
     public int ServiceId { get; set; }
 
     public string ServiceDescription { get; set; } = string.Empty;
+
+    public int? AssignedMechanicId { get; set; }
+
+    public string? AssignedMechanicName { get; set; }
 }

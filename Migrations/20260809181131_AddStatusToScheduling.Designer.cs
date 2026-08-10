@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pistachio.Api.Data;
@@ -11,9 +12,11 @@ using Pistachio.Api.Data;
 namespace Pistachio.api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260809181131_AddStatusToScheduling")]
+    partial class AddStatusToScheduling
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,9 +88,6 @@ namespace Pistachio.api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AssignedMechanicId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("ScheduledDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -105,8 +105,6 @@ namespace Pistachio.api.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AssignedMechanicId");
 
                     b.HasIndex("ServiceId");
 
@@ -168,12 +166,6 @@ namespace Pistachio.api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PasswordResetToken")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("PasswordResetTokenExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
@@ -211,11 +203,6 @@ namespace Pistachio.api.Migrations
 
             modelBuilder.Entity("Pistachio.Api.Models.Scheduling", b =>
                 {
-                    b.HasOne("Pistachio.Api.Models.User", "AssignedMechanic")
-                        .WithMany()
-                        .HasForeignKey("AssignedMechanicId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Pistachio.Api.Models.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -225,10 +212,8 @@ namespace Pistachio.api.Migrations
                     b.HasOne("Pistachio.Api.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AssignedMechanic");
 
                     b.Navigation("Service");
 
