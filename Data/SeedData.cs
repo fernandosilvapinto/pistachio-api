@@ -2,101 +2,42 @@ using Pistachio.Api.Models;
 
 namespace Pistachio.Api.Data;
 
-//Pistachio123!
-
+/// <summary>
+/// Dados de domínio para desenvolvimento. Não cria identidades: as pessoas
+/// autenticam-se no Keeper, e as linhas de User aqui são apenas referências
+/// locais, sem credenciais, reclamadas no primeiro login por email verificado.
+/// </summary>
 public static class SeedData
 {
     public static async Task InitializeAsync(AppDbContext context)
     {
-        if (context.Roles.Any())
+        if (context.Users.Any())
             return;
 
-        var adminRole = new Role { Name = "Admin" };
-        var managerRole = new Role { Name = "Manager" };
-        var mechanicRole = new Role { Name = "Mechanic" };
-        var customerRole = new Role { Name = "Customer" };
-
-        context.Roles.AddRange(
-            adminRole,
-            managerRole,
-            mechanicRole,
-            customerRole
-        );
-
-        await context.SaveChangesAsync();
-
-        var users = new List<User>
+        var people = new List<User>
         {
-            new()
-            {
-                Name = "Admin User",
-                Email = "admin@pistachio.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pistachio123!"),
-                RoleId = adminRole.Id
-            },
-
-            new()
-            {
-                Name = "Workshop Manager",
-                Email = "manager@pistachio.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pistachio123!"),
-                RoleId = managerRole.Id
-            },
-
-            new() // users[2] — mecânico
-            {
-                Name = "Senior Mechanic",
-                Email = "mechanic@pistachio.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pistachio123!"),
-                RoleId = mechanicRole.Id
-            },
-
-            new() // users[3] — mecânico
-            {
-                Name = "Junior Mechanic",
-                Email = "mechanic2@pistachio.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pistachio123!"),
-                RoleId = mechanicRole.Id
-            },
-
-            new() // users[4] — cliente
-            {
-                Name = "John Rider",
-                Email = "customer@pistachio.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pistachio123!"),
-                RoleId = customerRole.Id
-            },
-
-            new() // users[5] — cliente
-            {
-                Name = "Maria Santos",
-                Email = "maria@pistachio.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pistachio123!"),
-                RoleId = customerRole.Id
-            },
-
-            new() // users[6] — cliente
-            {
-                Name = "Carlos Ferreira",
-                Email = "carlos@pistachio.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pistachio123!"),
-                RoleId = customerRole.Id
-            }
+            new() { Name = "Admin User", Email = "admin@pistachio.local" },
+            new() { Name = "Workshop Manager", Email = "manager@pistachio.local" },
+            new() { Name = "Senior Mechanic", Email = "mechanic@pistachio.local" },
+            new() { Name = "Junior Mechanic", Email = "mechanic2@pistachio.local" },
+            new() { Name = "John Rider", Email = "customer@pistachio.local" },
+            new() { Name = "Maria Santos", Email = "maria@pistachio.local" },
+            new() { Name = "Carlos Ferreira", Email = "carlos@pistachio.local" }
         };
 
-        context.Users.AddRange(users);
+        context.Users.AddRange(people);
 
         await context.SaveChangesAsync();
 
-        var seniorMechanic = users[2];
-        var juniorMechanic = users[3];
-        var john = users[4];
-        var maria = users[5];
-        var carlos = users[6];
+        var seniorMechanic = people[2];
+        var juniorMechanic = people[3];
+        var john = people[4];
+        var maria = people[5];
+        var carlos = people[6];
 
         var services = new List<Service>
         {
-            new() // services[0]
+            new()
             {
                 Name = "Oil Change",
                 Description = "Engine oil and filter replacement",
@@ -105,7 +46,7 @@ public static class SeedData
                 IsFeatured = true
             },
 
-            new() // services[1]
+            new()
             {
                 Name = "Brake Inspection",
                 Description = "Complete brake system inspection",
@@ -113,7 +54,7 @@ public static class SeedData
                 IsActive = true
             },
 
-            new() // services[2]
+            new()
             {
                 Name = "Tyre Replacement",
                 Description = "Motorcycle tyre replacement",
@@ -122,7 +63,7 @@ public static class SeedData
                 IsFeatured = true
             },
 
-            new() // services[3]
+            new()
             {
                 Name = "General Service",
                 Description = "Scheduled maintenance service",
@@ -130,7 +71,7 @@ public static class SeedData
                 IsActive = true
             },
 
-            new() // services[4]
+            new()
             {
                 Name = "Electrical Diagnosis",
                 Description = "Electronic fault diagnosis",
@@ -138,7 +79,7 @@ public static class SeedData
                 IsActive = true
             },
 
-            new() // services[5] — inativo, para testar filtragem
+            new() // inativo, para testar filtragem
             {
                 Name = "Carburetor Tuning (Legacy)",
                 Description = "Serviço descontinuado, mantido só para histórico",
@@ -153,7 +94,7 @@ public static class SeedData
 
         var schedulings = new List<Scheduling>
         {
-            new() // schedulings[0]
+            new()
             {
                 ScheduledDate = DateTime.UtcNow.AddDays(3),
                 ServiceName = services[0].Name,
@@ -162,7 +103,7 @@ public static class SeedData
                 ServiceId = services[0].Id
             },
 
-            new() // schedulings[1]
+            new()
             {
                 ScheduledDate = DateTime.UtcNow.AddDays(5),
                 ServiceName = services[1].Name,
@@ -172,7 +113,7 @@ public static class SeedData
                 AssignedMechanicId = seniorMechanic.Id
             },
 
-            new() // schedulings[2]
+            new()
             {
                 ScheduledDate = DateTime.UtcNow.AddDays(-2),
                 ServiceName = services[2].Name,
@@ -182,7 +123,7 @@ public static class SeedData
                 AssignedMechanicId = juniorMechanic.Id
             },
 
-            new() // schedulings[3]
+            new()
             {
                 ScheduledDate = DateTime.UtcNow.AddDays(7),
                 ServiceName = services[3].Name,
@@ -191,7 +132,7 @@ public static class SeedData
                 ServiceId = services[3].Id
             },
 
-            new() // schedulings[4]
+            new()
             {
                 ScheduledDate = DateTime.UtcNow.AddDays(1),
                 ServiceName = services[4].Name,
@@ -200,7 +141,7 @@ public static class SeedData
                 ServiceId = services[4].Id
             },
 
-            new() // schedulings[5]
+            new()
             {
                 ScheduledDate = DateTime.UtcNow.AddDays(-5),
                 ServiceName = services[0].Name,

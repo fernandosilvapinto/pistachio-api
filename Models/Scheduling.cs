@@ -15,8 +15,8 @@ namespace Pistachio.Api.Models
         public int ServiceId { get; set; }
         public Service? Service { get; set; }
 
-        // Mecânico atribuído (opcional — pode não estar atribuído ainda)
-        public int? AssignedMechanicId { get; set; }
-        public User? AssignedMechanic { get; set; }
+        // Quem vai executar o serviço (opcional — pode ainda não estar atribuído)
+        public int? AssigneeId { get; set; }
+        public User? Assignee { get; set; }
     }
 }

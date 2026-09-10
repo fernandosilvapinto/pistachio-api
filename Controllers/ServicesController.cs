@@ -4,10 +4,11 @@ using Pistachio.Api.Data;
 using Pistachio.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Pistachio.Api.DTOs.Services;
+using Pistachio.Api.Authorization;
 
 namespace Pistachio.Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ServicesController : ControllerBase
@@ -64,6 +65,7 @@ namespace Pistachio.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = Permissions.ServicesWrite)]
         public async Task<IActionResult> Create(CreateServiceRequest request)
         {
             var service = new Service
@@ -93,6 +95,7 @@ namespace Pistachio.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Permissions.ServicesWrite)]
         public async Task<IActionResult> Update(int id, UpdateServiceRequest request)
         {
             var service = await _context.Services.FindAsync(id);
@@ -122,6 +125,7 @@ namespace Pistachio.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Permissions.ServicesWrite)]
         public async Task<IActionResult> Delete(int id)
         {
             var service = await _context.Services.FindAsync(id);

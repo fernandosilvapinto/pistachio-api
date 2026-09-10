@@ -6,7 +6,9 @@ public class UserResponse
 
     public string Email { get; set; } = string.Empty;
 
-    public string Role { get; set; } = string.Empty;
+    public bool HasSignedIn { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public DateTime? LastSeenAt { get; set; }
 }

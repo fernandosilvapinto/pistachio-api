@@ -2,8 +2,6 @@ using Pistachio.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Pistachio.Api.Data;
 using Microsoft.OpenApi.Models;
 using Pistachio.Api.Services;
 
@@ -62,26 +60,35 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // JWT Auth
-var jwt = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwt["Key"] ?? throw new InvalidOperationException("JWT Key not configured."));
-
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.Authority = builder.Configuration["Keeper:Authority"];
+        options.Audience = builder.Configuration["Keeper:Audience"];
+        options.RequireHttpsMetadata = false;
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwt["Issuer"],
-            ValidAudience = jwt["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key)
+            ClockSkew = TimeSpan.FromSeconds(30),
+            NameClaimType = "preferred_username"
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+builder.Services.AddScoped<UserProvisioning>();
+
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var permission in Permissions.All)
+    {
+        options.AddPolicy(permission, policy => policy.Requirements.Add(new PermissionRequirement(permission)));
+    }
+});
 
 // Envio de email (Mailpit em dev)
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -124,6 +131,7 @@ app.UseCors("DevCors");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<UserProvisioningMiddleware>();
 
 app.MapControllers();
 

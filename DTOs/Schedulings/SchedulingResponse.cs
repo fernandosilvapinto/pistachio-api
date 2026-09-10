@@ -20,7 +20,7 @@ public class SchedulingResponse
 
     public string ServiceDescription { get; set; } = string.Empty;
 
-    public int? AssignedMechanicId { get; set; }
+    public int? AssigneeId { get; set; }
 
-    public string? AssignedMechanicName { get; set; }
+    public string? AssigneeName { get; set; }
 }

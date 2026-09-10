@@ -10,7 +10,6 @@ namespace Pistachio.Api.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Scheduling> Schedulings { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Role> Roles { get; set; }
         public DbSet<Service> Services { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,12 +23,19 @@ namespace Pistachio.Api.Data
                 .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Scheduling.AssignedMechanic — opcional; se o mecânico for apagado, o campo fica null
+            // Scheduling.Assignee — opcional; se a pessoa for apagada, o campo fica null
             modelBuilder.Entity<Scheduling>()
-                .HasOne(s => s.AssignedMechanic)
+                .HasOne(s => s.Assignee)
                 .WithMany()
-                .HasForeignKey(s => s.AssignedMechanicId)
+                .HasForeignKey(s => s.AssigneeId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Subject é o claim "sub" do Keeper. Vazio significa conta por reclamar,
+            // criada pelo domínio antes de a pessoa se ter autenticado alguma vez.
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Subject)
+                .IsUnique()
+                .HasFilter("\"Subject\" <> ''");
         }
     }
 }

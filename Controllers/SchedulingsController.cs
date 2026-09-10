@@ -5,7 +5,8 @@ using Pistachio.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Pistachio.Api.DTOs.Schedulings;
 using Pistachio.Api.Services;
-using System.Security.Claims;
+using Pistachio.Api.Authorization;
+using Pistachio.Api.Identity;
 
 namespace Pistachio.Api.Controllers
 {
@@ -17,21 +18,30 @@ namespace Pistachio.Api.Controllers
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _config;
+        private readonly KeeperAdminClient _keeper;
 
-        public SchedulingsController(AppDbContext context, IEmailService emailService, IConfiguration config)
+        public SchedulingsController(
+            AppDbContext context,
+            IEmailService emailService,
+            IConfiguration config,
+            KeeperAdminClient keeper)
         {
             _context = context;
             _emailService = emailService;
             _config = config;
+            _keeper = keeper;
         }
 
         // GET: api/schedulings/mine — só os agendamentos do utilizador autenticado (área do cliente)
         [HttpGet("mine")]
+        [Authorize(Policy = Permissions.SchedulingRead)]
         public async Task<IActionResult> GetMine()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+            var localUserId = HttpContext.LocalUserId();
+            if (localUserId is null)
                 return Unauthorized();
+
+            var userId = localUserId.Value;
 
             var schedulings = await _context.Schedulings
                 .Where(s => s.UserId == userId)
@@ -45,8 +55,8 @@ namespace Pistachio.Api.Controllers
                     UserName = s.User.Name,
                     ServiceId = s.ServiceId,
                     ServiceDescription = s.Service != null ? s.Service.Description : string.Empty,
-                    AssignedMechanicId = s.AssignedMechanicId,
-                    AssignedMechanicName = s.AssignedMechanic != null ? s.AssignedMechanic.Name : null
+                    AssigneeId = s.AssigneeId,
+                    AssigneeName = s.Assignee != null ? s.Assignee.Name : null
                 })
                 .ToListAsync();
 
@@ -55,6 +65,7 @@ namespace Pistachio.Api.Controllers
 
         // GET: api/schedulings — todos os agendamentos (uso administrativo)
         [HttpGet]
+        [Authorize(Policy = Permissions.SchedulingRead)]
         public async Task<IActionResult> GetAll()
         {
             var schedulings = await _context.Schedulings
@@ -68,8 +79,8 @@ namespace Pistachio.Api.Controllers
                     UserName = s.User.Name,
                     ServiceId = s.ServiceId,
                     ServiceDescription = s.Service != null ? s.Service.Description : string.Empty,
-                    AssignedMechanicId = s.AssignedMechanicId,
-                    AssignedMechanicName = s.AssignedMechanic != null ? s.AssignedMechanic.Name : null
+                    AssigneeId = s.AssigneeId,
+                    AssigneeName = s.Assignee != null ? s.Assignee.Name : null
                 })
                 .ToListAsync();
 
@@ -78,6 +89,7 @@ namespace Pistachio.Api.Controllers
 
         // GET: api/schedulings/{id}
         [HttpGet("{id}")]
+        [Authorize(Policy = Permissions.SchedulingRead)]
         public async Task<IActionResult> GetById(int id)
         {
             var scheduling = await _context.Schedulings
@@ -92,8 +104,8 @@ namespace Pistachio.Api.Controllers
                     UserName = s.User.Name,
                     ServiceId = s.ServiceId,
                     ServiceDescription = s.Service != null ? s.Service.Description : string.Empty,
-                    AssignedMechanicId = s.AssignedMechanicId,
-                    AssignedMechanicName = s.AssignedMechanic != null ? s.AssignedMechanic.Name : null
+                    AssigneeId = s.AssigneeId,
+                    AssigneeName = s.Assignee != null ? s.Assignee.Name : null
                 })
                 .FirstOrDefaultAsync();
 
@@ -114,32 +126,21 @@ namespace Pistachio.Api.Controllers
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             var isNewAccount = user == null;
-            string? resetLink = null;
+            var signInUrl = _config["ClientUrl"] ?? "http://localhost:5174";
 
             if (user == null)
             {
-                var customerRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "Customer");
-                if (customerRole == null)
-                    return StatusCode(500, new { message = "Role Customer não encontrado." });
-
-                var resetToken = TokenGenerator.GenerateUrlSafeToken();
-
+                // Referência local sem identidade. Subject fica vazio até a pessoa
+                // se autenticar no Keeper com este email, momento em que a linha
+                // é reclamada pelo aprovisionamento just-in-time.
                 user = new User
                 {
                     Name = request.Name,
-                    Email = request.Email,
-                    // Password ainda não definida — a hash aqui é só um valor não utilizável até o reset.
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(TokenGenerator.GenerateUrlSafeToken()),
-                    RoleId = customerRole.Id,
-                    PasswordResetToken = resetToken,
-                    PasswordResetTokenExpiresAt = DateTime.UtcNow.AddHours(24),
+                    Email = request.Email
                 };
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
-
-                var clientUrl = _config["ClientUrl"] ?? "http://localhost:5174";
-                resetLink = $"{clientUrl}/reset-password?token={resetToken}";
             }
 
             var scheduling = new Scheduling
@@ -153,14 +154,32 @@ namespace Pistachio.Api.Controllers
             _context.Schedulings.Add(scheduling);
             await _context.SaveChangesAsync();
 
-            var emailBody = isNewAccount
-                ? $"<p>Olá {user.Name},</p>" +
-                  $"<p>O teu agendamento para <strong>{service.Name}</strong> em {request.ScheduledDate:dd/MM/yyyy HH:mm} foi confirmado.</p>" +
-                  $"<p>Criámos uma conta para acompanhares os teus agendamentos. Define a tua password aqui:</p>" +
-                  $"<p><a href=\"{resetLink}\">{resetLink}</a></p>"
-                : $"<p>Olá {user.Name},</p>" +
-                  $"<p>O teu agendamento para <strong>{service.Name}</strong> em {request.ScheduledDate:dd/MM/yyyy HH:mm} foi confirmado.</p>" +
-                  $"<p>Já tens conta connosco — inicia sessão para veres os detalhes.</p>";
+            // Convida a pessoa a criar conta no identity provider. A password
+            // é definida lá, nunca aqui. Uma falha no convite não invalida a
+            // marcação, que já está gravada.
+            var invitation = await _keeper.InviteCustomerAsync(
+                request.Email,
+                request.Name,
+                HttpContext.RequestAborted);
+
+            var confirmation =
+                $"<p>Olá {user.Name},</p>" +
+                $"<p>O teu agendamento para <strong>{service.Name}</strong> em {request.ScheduledDate:dd/MM/yyyy HH:mm} foi confirmado.</p>";
+
+            var emailBody = invitation switch
+            {
+                CustomerInvitationResult.Invited =>
+                    confirmation +
+                    "<p>Enviámos-te noutra mensagem um link para definires a tua password e acompanhares os teus agendamentos.</p>",
+
+                CustomerInvitationResult.AlreadyRegistered =>
+                    confirmation +
+                    $"<p>Já tens conta connosco — inicia sessão em <a href=\"{signInUrl}\">{signInUrl}</a> para veres os detalhes.</p>",
+
+                _ =>
+                    confirmation +
+                    $"<p>Podes acompanhar os teus agendamentos em <a href=\"{signInUrl}\">{signInUrl}</a>.</p>"
+            };
 
             await _emailService.SendEmailAsync(user.Email, "Agendamento confirmado — Pistachio", emailBody);
 
@@ -168,11 +187,13 @@ namespace Pistachio.Api.Controllers
             {
                 message = "Agendamento criado com sucesso.",
                 isNewAccount,
+                invitation = invitation.ToString(),
                 schedulingId = scheduling.Id,
             });
         }
 
         [HttpPost]
+        [Authorize(Policy = Permissions.SchedulingWrite)]
         public async Task<IActionResult> Create(CreateSchedulingRequest request)
         {
             var scheduling = new Scheduling
@@ -195,13 +216,14 @@ namespace Pistachio.Api.Controllers
                 Status = scheduling.Status,
                 UserId = scheduling.UserId,
                 ServiceId = scheduling.ServiceId,
-                AssignedMechanicId = scheduling.AssignedMechanicId
+                AssigneeId = scheduling.AssigneeId
             };
 
             return CreatedAtAction(nameof(GetById), new { id = scheduling.Id }, response);
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Permissions.SchedulingWrite)]
         public async Task<IActionResult> Update(int id, UpdateSchedulingRequest request)
         {
             var scheduling = await _context.Schedulings.FindAsync(id);
@@ -231,6 +253,7 @@ namespace Pistachio.Api.Controllers
         
         // PATCH: api/schedulings/{id}/status
         [HttpPatch("{id}/status")]
+        [Authorize(Policy = Permissions.SchedulingStatus)]
         public async Task<IActionResult> UpdateStatus(int id, UpdateSchedulingStatusRequest request)
         {
             var scheduling = await _context.Schedulings.FindAsync(id);
@@ -255,23 +278,24 @@ namespace Pistachio.Api.Controllers
             return Ok(response);
         }
 
-        // PATCH: api/schedulings/{id}/mechanic
-        [HttpPatch("{id}/mechanic")]
-        public async Task<IActionResult> UpdateMechanic(int id, UpdateSchedulingMechanicRequest request)
+        // PATCH: api/schedulings/{id}/assignee
+        [HttpPatch("{id}/assignee")]
+        [Authorize(Policy = Permissions.SchedulingAssign)]
+        public async Task<IActionResult> UpdateAssignee(int id, UpdateSchedulingAssigneeRequest request)
         {
             var scheduling = await _context.Schedulings.FindAsync(id);
 
             if (scheduling == null)
                 return NotFound();
 
-            if (request.AssignedMechanicId.HasValue)
+            if (request.AssigneeId.HasValue)
             {
-                var mechanic = await _context.Users.FindAsync(request.AssignedMechanicId.Value);
-                if (mechanic == null)
-                    return BadRequest("Mecânico não encontrado.");
+                var assignee = await _context.Users.FindAsync(request.AssigneeId.Value);
+                if (assignee == null)
+                    return BadRequest("Utilizador não encontrado.");
             }
 
-            scheduling.AssignedMechanicId = request.AssignedMechanicId;
+            scheduling.AssigneeId = request.AssigneeId;
 
             await _context.SaveChangesAsync();
 
@@ -287,8 +311,8 @@ namespace Pistachio.Api.Controllers
                     UserName = s.User.Name,
                     ServiceId = s.ServiceId,
                     ServiceDescription = s.Service != null ? s.Service.Description : string.Empty,
-                    AssignedMechanicId = s.AssignedMechanicId,
-                    AssignedMechanicName = s.AssignedMechanic != null ? s.AssignedMechanic.Name : null
+                    AssigneeId = s.AssigneeId,
+                    AssigneeName = s.Assignee != null ? s.Assignee.Name : null
                 })
                 .FirstOrDefaultAsync();
 
@@ -296,6 +320,7 @@ namespace Pistachio.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Permissions.SchedulingDelete)]
         public async Task<IActionResult> Delete(int id)
         {
             var scheduling = await _context.Schedulings.FindAsync(id);

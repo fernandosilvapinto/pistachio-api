@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Pistachio.Api.Authorization;
 using Pistachio.Api.Data;
 using Pistachio.Api.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Pistachio.Api.Controllers
 {
@@ -18,20 +19,20 @@ namespace Pistachio.Api.Controllers
             _context = context;
         }
 
-        // GET: api/Payments
         [HttpGet]
+        [Authorize(Policy = Permissions.PaymentsRead)]
         public async Task<IActionResult> GetAll()
         {
-            var Payments = await _context.Payments
+            var payments = await _context.Payments
                 .Include(p => p.User)
                 .Include(p => p.Service)
                 .ToListAsync();
 
-            return Ok(Payments);
+            return Ok(payments);
         }
 
-        // GET: api/Payments/{id}
         [HttpGet("{id}")]
+        [Authorize(Policy = Permissions.PaymentsRead)]
         public async Task<IActionResult> GetById(int id)
         {
             var payment = await _context.Payments
@@ -45,8 +46,8 @@ namespace Pistachio.Api.Controllers
             return Ok(payment);
         }
 
-        
         [HttpPost]
+        [Authorize(Policy = Permissions.PaymentsWrite)]
         public async Task<IActionResult> Create(Payment payment)
         {
             _context.Payments.Add(payment);
@@ -55,6 +56,7 @@ namespace Pistachio.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Permissions.PaymentsWrite)]
         public async Task<IActionResult> Update(int id, Payment payment)
         {
             if (id != payment.Id) return BadRequest();
@@ -77,6 +79,7 @@ namespace Pistachio.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Permissions.PaymentsWrite)]
         public async Task<IActionResult> Delete(int id)
         {
             var payment = await _context.Payments.FindAsync(id);
