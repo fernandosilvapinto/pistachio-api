@@ -1,0 +1,99 @@
+/*
+ * Login theme for the customer-facing application.
+ *
+ * The identity provider owns the sign-in screen — the application never sees a
+ * password — but the person signing in should not feel handed off to a
+ * different product. Everything here is presentation; no template is
+ * overridden, so upgrades to the provider do not break it.
+ */
+
+:root {
+  --brand-ink: #101817;
+  --brand-surface: #ffffff;
+  --brand-ground: #f3f5f4;
+  --brand-line: #d5dcd9;
+  --brand-accent: #0e6e63;
+  --brand-accent-hover: #0a544b;
+  --brand-muted: #6e7a78;
+}
+
+body.pistachio,
+body.pistachio .login-pf-page {
+  background: var(--brand-ground);
+  color: var(--brand-ink);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+body.pistachio .login-pf-header h1,
+body.pistachio #kc-page-title {
+  color: var(--brand-ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+body.pistachio .card-pf,
+body.pistachio .pf-v5-c-card,
+body.pistachio #kc-form-login {
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-line);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(16, 24, 23, 0.06), 0 8px 24px -16px rgba(16, 24, 23, 0.3);
+}
+
+body.pistachio input[type="text"],
+body.pistachio input[type="password"],
+body.pistachio input[type="email"],
+body.pistachio .pf-v5-c-form-control {
+  border: 1px solid var(--brand-line);
+  border-radius: 4px;
+}
+
+body.pistachio input:focus,
+body.pistachio .pf-v5-c-form-control:focus-within {
+  outline: 2px solid var(--brand-accent);
+  outline-offset: 1px;
+  border-color: var(--brand-accent);
+}
+
+body.pistachio .pf-v5-c-button.pf-m-primary,
+body.pistachio input[type="submit"],
+body.pistachio #kc-login {
+  background: var(--brand-accent);
+  border-color: var(--brand-accent);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+body.pistachio .pf-v5-c-button.pf-m-primary:hover,
+body.pistachio input[type="submit"]:hover,
+body.pistachio #kc-login:hover {
+  background: var(--brand-accent-hover);
+  border-color: var(--brand-accent-hover);
+}
+
+body.pistachio a {
+  color: var(--brand-accent-hover);
+}
+
+body.pistachio #kc-info,
+body.pistachio .kc-social-section,
+body.pistachio .login-pf-signup {
+  color: var(--brand-muted);
+}
+
+/*
+ * The provider's own wordmark is replaced by the operator's name. Swap the
+ * content for an image once there is a logo file in this theme's resources.
+ */
+body.pistachio #kc-header-wrapper {
+  font-size: 0;
+  padding: 24px 0 8px;
+}
+
+body.pistachio #kc-header-wrapper::after {
+  content: "Pistachio";
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--brand-ink);
+}

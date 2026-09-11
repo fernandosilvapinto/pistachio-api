@@ -63,24 +63,38 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // JWT Auth
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+var audience = builder.Configuration["Keeper:Audience"]
+    ?? throw new InvalidOperationException("Keeper:Audience is not configured.");
+var workforceAuthority = builder.Configuration["Keeper:Workforce:Authority"]
+    ?? throw new InvalidOperationException("Keeper:Workforce:Authority is not configured.");
+var customersAuthority = builder.Configuration["Keeper:Customers:Authority"]
+    ?? throw new InvalidOperationException("Keeper:Customers:Authority is not configured.");
+
+static Action<JwtBearerOptions> Realm(string authority, string audience) => options =>
+{
+    options.Authority = authority;
+    options.Audience = audience;
+    options.RequireHttpsMetadata = false;
+    options.MapInboundClaims = false;
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.Authority = builder.Configuration["Keeper:Authority"];
-        options.Audience = builder.Configuration["Keeper:Audience"];
-        options.RequireHttpsMetadata = false;
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ClockSkew = TimeSpan.FromSeconds(30),
-            NameClaimType = "preferred_username"
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.FromSeconds(30),
+        NameClaimType = "preferred_username"
+    };
+};
+
+builder.Services
+    .AddAuthentication(IssuerSchemes.Selector)
+    .AddPolicyScheme(IssuerSchemes.Selector, IssuerSchemes.Selector, options =>
+    {
+        options.ForwardDefaultSelector = context => IssuerSchemes.Select(context, customersAuthority);
+    })
+    .AddJwtBearer(IssuerSchemes.Workforce, Realm(workforceAuthority, audience))
+    .AddJwtBearer(IssuerSchemes.Customers, Realm(customersAuthority, audience));
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 builder.Services.AddScoped<UserProvisioning>();
