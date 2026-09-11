@@ -110,7 +110,7 @@ public static class SeedData
                 Status = SchedulingStatus.Confirmed,
                 UserId = john.Id,
                 ServiceId = services[1].Id,
-                AssignedMechanicId = seniorMechanic.Id
+                AssigneeId = seniorMechanic.Id
             },
 
             new()
@@ -120,7 +120,7 @@ public static class SeedData
                 Status = SchedulingStatus.Completed,
                 UserId = maria.Id,
                 ServiceId = services[2].Id,
-                AssignedMechanicId = juniorMechanic.Id
+                AssigneeId = juniorMechanic.Id
             },
 
             new()
@@ -148,7 +148,7 @@ public static class SeedData
                 Status = SchedulingStatus.Completed,
                 UserId = carlos.Id,
                 ServiceId = services[0].Id,
-                AssignedMechanicId = seniorMechanic.Id
+                AssigneeId = seniorMechanic.Id
             }
         };
 

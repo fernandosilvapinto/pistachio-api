@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Pistachio.Api.Services;
+using Microsoft.AspNetCore.Authorization;
+using Pistachio.Api.Authorization;
+using Pistachio.Api.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,6 +84,9 @@ builder.Services
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 builder.Services.AddScoped<UserProvisioning>();
+
+builder.Services.Configure<KeeperAdminOptions>(builder.Configuration.GetSection("Keeper:Admin"));
+builder.Services.AddHttpClient<KeeperAdminClient>();
 
 builder.Services.AddAuthorization(options =>
 {
