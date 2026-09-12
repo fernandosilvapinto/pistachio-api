@@ -15,13 +15,12 @@ public static class Permissions
     public const string PaymentsWrite = "payments:write";
 
     public const string UsersRead = "users:read";
-    public const string UsersWrite = "users:write";
 
     public static readonly string[] All =
     [
         ServicesRead, ServicesWrite,
         SchedulingRead, SchedulingWrite, SchedulingStatus, SchedulingAssign, SchedulingDelete,
         PaymentsRead, PaymentsWrite,
-        UsersRead, UsersWrite
+        UsersRead
     ];
 }

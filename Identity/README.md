@@ -30,7 +30,11 @@ introduced without changing application code.
 | `payments:read` | Reading payments |
 | `payments:write` | Creating, updating and removing payments |
 | `users:read` | Listing the local reference rows for people |
-| `users:write` | Reserved; creating and disabling people happens in the provider |
+
+The catalog declares only permissions the application actually enforces. Writing
+to a person — creating, renaming, disabling — is an identity operation and has
+no counterpart here: it happens in the provider, so no `users:write` permission
+exists to be granted by mistake.
 
 The public service catalog and the guest booking endpoint stay anonymous and
 require no permission.
@@ -45,7 +49,10 @@ single source of truth, and reach the application through the access token.
 | `pistachio-customer` | `scheduling:read`, `scheduling:write` |
 | `pistachio-staff` | plus `services:read`, `scheduling:status` |
 | `pistachio-manager` | plus `services:write`, `scheduling:assign`, `scheduling:delete`, `payments:*`, `users:read` |
-| `pistachio-admin` | plus `users:write` |
+
+Each tier is a strict superset of the one above it, and no two tiers carry the
+same permission set. A role that would duplicate an existing one is a role that
+does not exist yet.
 
 ## Service account
 

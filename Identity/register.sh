@@ -21,7 +21,7 @@ echo "### $KEEPER_REALM"
 "$KEEPER_HOME/register-api.sh" "$API" "services:read,services:write,\
 scheduling:read,scheduling:write,scheduling:status,scheduling:assign,scheduling:delete,\
 payments:read,payments:write,\
-users:read,users:write"
+users:read"
 
 "$KEEPER_HOME/register-spa.sh" pistachio-admin "$ADMIN_ORIGIN" "$API"
 
@@ -33,12 +33,6 @@ users:read,users:write"
 $API:scheduling:read,$API:scheduling:write,$API:scheduling:status,$API:scheduling:assign,$API:scheduling:delete,\
 $API:payments:read,$API:payments:write,\
 $API:users:read"
-
-"$KEEPER_HOME/register-role.sh" pistachio-admin \
-"$API:services:read,$API:services:write,\
-$API:scheduling:read,$API:scheduling:write,$API:scheduling:status,$API:scheduling:assign,$API:scheduling:delete,\
-$API:payments:read,$API:payments:write,\
-$API:users:read,$API:users:write"
 
 # ---------------------------------------------------------------------------
 # Customers realm — people who buy services.
