@@ -15,11 +15,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// CORS - restrito para o frontend em dev
+// CORS — as origens permitidas são configuração, não código. Uma aplicação
+// nova que passe a consumir esta API é uma linha de ambiente, tal como o seu
+// registo no Keeper é uma chamada a um script.
+var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>()
+    ?? ["http://admin.localtest.me:5173", "http://pistachio.localtest.me:5174"];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevCors", p => p
-        .WithOrigins("http://localhost:5173", "http://localhost:5174")
+        .WithOrigins(corsOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod());
 });
