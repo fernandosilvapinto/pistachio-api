@@ -7,7 +7,7 @@ namespace Pistachio.Api.Identity;
 
 /// <summary>
 /// Keeps a local reference row for every identity that reaches this API.
-/// Identity itself lives in Keeper; this row only exists so domain records
+/// Identity itself lives in Anvil; this row only exists so domain records
 /// can point at a person.
 /// </summary>
 public sealed class UserProvisioning

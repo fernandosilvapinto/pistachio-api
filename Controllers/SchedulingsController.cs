@@ -18,18 +18,18 @@ namespace Pistachio.Api.Controllers
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _config;
-        private readonly KeeperAdminClient _keeper;
+        private readonly AnvilAdminClient _anvil;
 
         public SchedulingsController(
             AppDbContext context,
             IEmailService emailService,
             IConfiguration config,
-            KeeperAdminClient keeper)
+            AnvilAdminClient anvil)
         {
             _context = context;
             _emailService = emailService;
             _config = config;
-            _keeper = keeper;
+            _anvil = anvil;
         }
 
         // GET: api/schedulings/mine — só os agendamentos do utilizador autenticado (área do cliente)
@@ -132,7 +132,7 @@ namespace Pistachio.Api.Controllers
             // if (user == null)
             // {
             //     // Referência local sem identidade. Subject fica vazio até a pessoa
-            //     // se autenticar no Keeper com este email, momento em que a linha
+            //     // se autenticar no Anvil com este email, momento em que a linha
             //     // é reclamada pelo aprovisionamento just-in-time.
             //     user = new User
             //     {
@@ -158,7 +158,7 @@ namespace Pistachio.Api.Controllers
             // // Convida a pessoa a criar conta no identity provider. A password
             // // é definida lá, nunca aqui. Uma falha no convite não invalida a
             // // marcação, que já está gravada.
-            // var invitation = await _keeper.InviteCustomerAsync(
+            // var invitation = await _anvil.InviteCustomerAsync(
             //     request.Email,
             //     request.Name,
             //     HttpContext.RequestAborted);

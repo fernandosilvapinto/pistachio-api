@@ -4,7 +4,7 @@ namespace Pistachio.Api.Data;
 
 /// <summary>
 /// Dados de domínio para desenvolvimento. Não cria identidades: as pessoas
-/// autenticam-se no Keeper, e as linhas de User aqui são apenas referências
+/// autenticam-se no Anvil, e as linhas de User aqui são apenas referências
 /// locais, sem credenciais, reclamadas no primeiro login por email verificado.
 /// </summary>
 public static class SeedData

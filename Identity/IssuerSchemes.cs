@@ -10,9 +10,9 @@ namespace Pistachio.Api.Identity;
 /// </summary>
 public static class IssuerSchemes
 {
-    public const string Selector = "Keeper";
-    public const string Workforce = "Keeper.Workforce";
-    public const string Customers = "Keeper.Customers";
+    public const string Selector = "Anvil";
+    public const string Workforce = "Anvil.Workforce";
+    public const string Customers = "Anvil.Customers";
 
     private static readonly JsonWebTokenHandler Handler = new();
 

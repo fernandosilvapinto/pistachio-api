@@ -13,7 +13,7 @@ namespace Pistachio.api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260911000133_KeeperIdentityAndAssigneeRename")]
-    partial class KeeperIdentityAndAssigneeRename
+    partial class AnvilIdentityAndAssigneeRename
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

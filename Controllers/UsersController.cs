@@ -8,7 +8,7 @@ namespace Pistachio.Api.Controllers
 {
     /// <summary>
     /// Read-only view over the local reference rows. Creating, disabling and
-    /// renaming people are identity operations and happen in Keeper.
+    /// renaming people are identity operations and happen in Anvil.
     /// </summary>
     [Authorize]
     [Route("api/[controller]")]

@@ -8,7 +8,7 @@ using Pistachio.Api.Identity;
 namespace Pistachio.Api.Controllers;
 
 /// <summary>
-/// Authentication happens in Keeper. This controller only reports what the
+/// Authentication happens in Anvil. This controller only reports what the
 /// current token grants, so the front end knows what to render.
 /// </summary>
 [Authorize]
@@ -59,7 +59,7 @@ public class AuthController : ControllerBase
 
     private IReadOnlyCollection<string> ReadPermissions()
     {
-        var audience = _configuration["Keeper:Audience"];
+        var audience = _configuration["Anvil:Audience"];
         var raw = User.FindFirst("resource_access")?.Value;
 
         if (string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(raw))

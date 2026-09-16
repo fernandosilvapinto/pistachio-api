@@ -1,6 +1,6 @@
 # Identity registration
 
-Registers this application with the Keeper identity provider: the resource
+Registers this application with the Anvil identity provider: the resource
 server and its permissions, the two front-end clients, and the business roles
 that aggregate permissions.
 
@@ -9,8 +9,8 @@ that aggregate permissions.
 ```
 
 The script is idempotent — running it again updates origins and leaves existing
-objects untouched. It expects Keeper to be running and reachable, and locates it
-through `KEEPER_HOME`, defaulting to a `keeper` directory alongside the
+objects untouched. It expects Anvil to be running and reachable, and locates it
+through `ANVIL_HOME`, defaulting to a `anvil` directory alongside the
 application repositories.
 
 ## Permissions

@@ -78,9 +78,9 @@ dependencies. Configuration comes from environment variables:
 | Variable | Purpose |
 |---|---|
 | `ConnectionStrings__DefaultConnection` | PostgreSQL |
-| `Keeper__Authority` | Realm URL of the identity provider |
-| `Keeper__Audience` | This API's audience, validated on every token |
-| `Keeper__Admin__*` | Service account used to create guest accounts |
+| `Anvil__Authority` | Realm URL of the identity provider |
+| `Anvil__Audience` | This API's audience, validated on every token |
+| `Anvil__Admin__*` | Service account used to create guest accounts |
 | `Smtp__*` | Outbound mail |
 | `ClientUrl` | Public address of the customer application |
 

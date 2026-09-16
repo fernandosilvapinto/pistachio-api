@@ -17,7 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // CORS — as origens permitidas são configuração, não código. Uma aplicação
 // nova que passe a consumir esta API é uma linha de ambiente, tal como o seu
-// registo no Keeper é uma chamada a um script.
+// registo no Anvil é uma chamada a um script.
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>()
     ?? ["http://admin.localtest.me:5173", "http://pistachio.localtest.me:5174"];
 
@@ -68,12 +68,12 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // JWT Auth
-var audience = builder.Configuration["Keeper:Audience"]
-    ?? throw new InvalidOperationException("Keeper:Audience is not configured.");
-var workforceAuthority = builder.Configuration["Keeper:Workforce:Authority"]
-    ?? throw new InvalidOperationException("Keeper:Workforce:Authority is not configured.");
-var customersAuthority = builder.Configuration["Keeper:Customers:Authority"]
-    ?? throw new InvalidOperationException("Keeper:Customers:Authority is not configured.");
+var audience = builder.Configuration["Anvil:Audience"]
+    ?? throw new InvalidOperationException("Anvil:Audience is not configured.");
+var workforceAuthority = builder.Configuration["Anvil:Workforce:Authority"]
+    ?? throw new InvalidOperationException("Anvil:Workforce:Authority is not configured.");
+var customersAuthority = builder.Configuration["Anvil:Customers:Authority"]
+    ?? throw new InvalidOperationException("Anvil:Customers:Authority is not configured.");
 
 static Action<JwtBearerOptions> Realm(string authority, string audience) => options =>
 {
@@ -104,8 +104,8 @@ builder.Services
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 builder.Services.AddScoped<UserProvisioning>();
 
-builder.Services.Configure<KeeperAdminOptions>(builder.Configuration.GetSection("Keeper:Admin"));
-builder.Services.AddHttpClient<KeeperAdminClient>();
+builder.Services.Configure<AnvilAdminOptions>(builder.Configuration.GetSection("Anvil:Admin"));
+builder.Services.AddHttpClient<AnvilAdminClient>();
 
 builder.Services.AddAuthorization(options =>
 {

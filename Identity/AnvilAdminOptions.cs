@@ -1,6 +1,6 @@
 namespace Pistachio.Api.Identity;
 
-public sealed class KeeperAdminOptions
+public sealed class AnvilAdminOptions
 {
     /// <summary>Disables provisioning without removing the configuration.</summary>
     public bool Enabled { get; set; } = true;

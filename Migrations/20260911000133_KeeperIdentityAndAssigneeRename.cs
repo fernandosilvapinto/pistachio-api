@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Pistachio.api.Migrations
 {
     /// <inheritdoc />
-    public partial class KeeperIdentityAndAssigneeRename : Migration
+    public partial class AnvilIdentityAndAssigneeRename : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

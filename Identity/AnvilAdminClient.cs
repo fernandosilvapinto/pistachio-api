@@ -10,20 +10,20 @@ namespace Pistachio.Api.Identity;
 /// behalf, using a service account. The application never sees a password:
 /// the provider emails the invitation and collects the password itself.
 /// </summary>
-public sealed class KeeperAdminClient
+public sealed class AnvilAdminClient
 {
     private readonly HttpClient _http;
-    private readonly KeeperAdminOptions _options;
-    private readonly ILogger<KeeperAdminClient> _logger;
+    private readonly AnvilAdminOptions _options;
+    private readonly ILogger<AnvilAdminClient> _logger;
     private readonly SemaphoreSlim _tokenLock = new(1, 1);
 
     private string? _accessToken;
     private DateTimeOffset _accessTokenExpiresAt = DateTimeOffset.MinValue;
 
-    public KeeperAdminClient(
+    public AnvilAdminClient(
         HttpClient http,
-        IOptions<KeeperAdminOptions> options,
-        ILogger<KeeperAdminClient> logger)
+        IOptions<AnvilAdminOptions> options,
+        ILogger<AnvilAdminClient> logger)
     {
         _http = http;
         _options = options.Value;

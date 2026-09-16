@@ -10,8 +10,8 @@ public sealed class PermissionHandler : AuthorizationHandler<PermissionRequireme
     private readonly string _audience;
 
     public PermissionHandler(IConfiguration configuration)
-        => _audience = configuration["Keeper:Audience"]
-           ?? throw new InvalidOperationException("Keeper:Audience is not configured.");
+        => _audience = configuration["Anvil:Audience"]
+           ?? throw new InvalidOperationException("Anvil:Audience is not configured.");
 
     protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,

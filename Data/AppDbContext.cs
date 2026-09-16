@@ -30,7 +30,7 @@ namespace Pistachio.Api.Data
                 .HasForeignKey(s => s.AssigneeId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Subject é o claim "sub" do Keeper. Vazio significa conta por reclamar,
+            // Subject é o claim "sub" do Anvil. Vazio significa conta por reclamar,
             // criada pelo domínio antes de a pessoa se ter autenticado alguma vez.
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Subject)
