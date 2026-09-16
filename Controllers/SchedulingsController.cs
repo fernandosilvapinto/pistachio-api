@@ -120,76 +120,77 @@ namespace Pistachio.Api.Controllers
         [HttpPost("guest")]
         public async Task<IActionResult> CreateGuest(CreateGuestSchedulingRequest request)
         {
-            var service = await _context.Services.FindAsync(request.ServiceId);
-            if (service == null || !service.IsActive)
-                return BadRequest(new { message = "Serviço inválido." });
+            return NotFound();
+            // var service = await _context.Services.FindAsync(request.ServiceId);
+            // if (service == null || !service.IsActive)
+            //     return BadRequest(new { message = "Serviço inválido." });
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            var isNewAccount = user == null;
-            var signInUrl = _config["ClientUrl"] ?? "http://localhost:5174";
+            // var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            // var isNewAccount = user == null;
+            // var signInUrl = _config["ClientUrl"] ?? "http://localhost:5174";
 
-            if (user == null)
-            {
-                // Referência local sem identidade. Subject fica vazio até a pessoa
-                // se autenticar no Keeper com este email, momento em que a linha
-                // é reclamada pelo aprovisionamento just-in-time.
-                user = new User
-                {
-                    Name = request.Name,
-                    Email = request.Email
-                };
+            // if (user == null)
+            // {
+            //     // Referência local sem identidade. Subject fica vazio até a pessoa
+            //     // se autenticar no Keeper com este email, momento em que a linha
+            //     // é reclamada pelo aprovisionamento just-in-time.
+            //     user = new User
+            //     {
+            //         Name = request.Name,
+            //         Email = request.Email
+            //     };
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-            }
+            //     _context.Users.Add(user);
+            //     await _context.SaveChangesAsync();
+            // }
 
-            var scheduling = new Scheduling
-            {
-                ScheduledDate = request.ScheduledDate,
-                ServiceName = service.Name,
-                UserId = user.Id,
-                ServiceId = service.Id,
-            };
+            // var scheduling = new Scheduling
+            // {
+            //     ScheduledDate = request.ScheduledDate,
+            //     ServiceName = service.Name,
+            //     UserId = user.Id,
+            //     ServiceId = service.Id,
+            // };
 
-            _context.Schedulings.Add(scheduling);
-            await _context.SaveChangesAsync();
+            // _context.Schedulings.Add(scheduling);
+            // await _context.SaveChangesAsync();
 
-            // Convida a pessoa a criar conta no identity provider. A password
-            // é definida lá, nunca aqui. Uma falha no convite não invalida a
-            // marcação, que já está gravada.
-            var invitation = await _keeper.InviteCustomerAsync(
-                request.Email,
-                request.Name,
-                HttpContext.RequestAborted);
+            // // Convida a pessoa a criar conta no identity provider. A password
+            // // é definida lá, nunca aqui. Uma falha no convite não invalida a
+            // // marcação, que já está gravada.
+            // var invitation = await _keeper.InviteCustomerAsync(
+            //     request.Email,
+            //     request.Name,
+            //     HttpContext.RequestAborted);
 
-            var confirmation =
-                $"<p>Olá {user.Name},</p>" +
-                $"<p>O teu agendamento para <strong>{service.Name}</strong> em {request.ScheduledDate:dd/MM/yyyy HH:mm} foi confirmado.</p>";
+            // var confirmation =
+            //     $"<p>Olá {user.Name},</p>" +
+            //     $"<p>O teu agendamento para <strong>{service.Name}</strong> em {request.ScheduledDate:dd/MM/yyyy HH:mm} foi confirmado.</p>";
 
-            var emailBody = invitation switch
-            {
-                CustomerInvitationResult.Invited =>
-                    confirmation +
-                    "<p>Enviámos-te noutra mensagem um link para definires a tua password e acompanhares os teus agendamentos.</p>",
+            // var emailBody = invitation switch
+            // {
+            //     CustomerInvitationResult.Invited =>
+            //         confirmation +
+            //         "<p>Enviámos-te noutra mensagem um link para definires a tua password e acompanhares os teus agendamentos.</p>",
 
-                CustomerInvitationResult.AlreadyRegistered =>
-                    confirmation +
-                    $"<p>Já tens conta connosco — inicia sessão em <a href=\"{signInUrl}\">{signInUrl}</a> para veres os detalhes.</p>",
+            //     CustomerInvitationResult.AlreadyRegistered =>
+            //         confirmation +
+            //         $"<p>Já tens conta connosco — inicia sessão em <a href=\"{signInUrl}\">{signInUrl}</a> para veres os detalhes.</p>",
 
-                _ =>
-                    confirmation +
-                    $"<p>Podes acompanhar os teus agendamentos em <a href=\"{signInUrl}\">{signInUrl}</a>.</p>"
-            };
+            //     _ =>
+            //         confirmation +
+            //         $"<p>Podes acompanhar os teus agendamentos em <a href=\"{signInUrl}\">{signInUrl}</a>.</p>"
+            // };
 
-            await _emailService.SendEmailAsync(user.Email, "Agendamento confirmado — Pistachio", emailBody);
+            // await _emailService.SendEmailAsync(user.Email, "Agendamento confirmado — Pistachio", emailBody);
 
-            return Ok(new
-            {
-                message = "Agendamento criado com sucesso.",
-                isNewAccount,
-                invitation = invitation.ToString(),
-                schedulingId = scheduling.Id,
-            });
+            // return Ok(new
+            // {
+            //     message = "Agendamento criado com sucesso.",
+            //     isNewAccount,
+            //     invitation = invitation.ToString(),
+            //     schedulingId = scheduling.Id,
+            // });
         }
 
         [HttpPost]
