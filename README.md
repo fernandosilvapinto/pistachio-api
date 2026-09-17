@@ -97,3 +97,5 @@ Services/        email delivery
 Authorization/   permission policies
 Identity/        token-to-person mapping and guest account creation
 ```
+
+<!-- teste da pipeline de deploy -->
